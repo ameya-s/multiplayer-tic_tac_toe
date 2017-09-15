@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Tic Tac Toe</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g=" crossorigin="anonymous"></script>
+    <script src="https://use.fontawesome.com/91471bcffb.js"></script>
+    <script src="app.js"></script>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="player-info">
+            <label for="player-name">Enter your name: </label>
+            <input type="text" id="player-name" name="player-name" />
+            <button type="submit" id="submit">Play</button>
+            <label id="winner"></label>
+        </div>
+        <label class="message"></label>
+        <button type="submit" id="new" style="display:none;">Start New Game</button>
+        <div id="matrix" class="no-start">
+            <div class="matrix-row">
+                <div class="matrix-cell" data-marker="0"></div>
+                <div class="matrix-cell" data-marker="0"></div>
+                <div class="matrix-cell" data-marker="0"></div>
+            </div>
+            <div class="matrix-row">
+                <div class="matrix-cell" data-marker="0"></div>
+                <div class="matrix-cell" data-marker="0"></div>
+                <div class="matrix-cell" data-marker="0"></div>
+            </div>
+            <div class="matrix-row">
+                <div class="matrix-cell" data-marker="0"></div>
+                <div class="matrix-cell" data-marker="0"></div>
+                <div class="matrix-cell" data-marker="0"></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,41 @@
+.wrapper {
+    max-width: 640px;
+    margin: 50px auto;
+    padding: 50px;
+    text-align: center;
+}
+
+label#winner {
+    font-size: 25px;
+    margin: 10px 0;
+    display: block;
+    color: #0d3abf;
+    font-family: monospace;
+    font-weight: bold;
+}
+
+div#matrix {
+    display: table;
+    border: 1px solid #000;
+    width: 225px;
+    margin: auto;
+}
+
+.matrix-row {
+    /* min-height: 75px; */
+    display: table-row;
+}
+
+.matrix-cell {
+    display: table-cell;
+    width: 33.3%;
+    height: 75px;
+    vertical-align: middle;
+    text-align: center;
+    font-size: 65px;
+    border: 1px solid #000;
+}
+
+.matrix-cell[data-marker="0"] {
+    cursor: pointer;
+}
