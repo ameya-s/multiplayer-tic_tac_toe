@@ -39,3 +39,8 @@ div#matrix {
 .matrix-cell[data-marker="0"] {
     cursor: pointer;
 }
+div.no-start {
+    pointer-events: none;
+    cursor: none;
+    opacity: 0.3;
+}

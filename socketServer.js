@@ -1,12 +1,13 @@
 const express = require('express'),
     path = require('path'),
     WebSocket = require('ws'),
-    http = require('http'),
     url = require('url'),
     fs = require('fs');
 
 // Initiate express object
-const app = new express();
+const app = new express(),
+    http = require('http').createServer(app),
+    socketIO = require('socket.io')(http);
 
 // Serve static files from public directory
 app.use(express.static('public'));
@@ -16,54 +17,55 @@ app.get('/', (request, response) => {
     response.send('this is socket server');
 });
 
-// Define http server for express app, use this server to create new intance of WebSocket
-const server = http.createServer(app);
-const socket = new WebSocket.Server({
-    server,
-    clientTracking: true
-});
-
 var players = [],
     games = {};
 
-socket.on('connection', function connection(ws, request) {
-    const location = url.parse(request.url, true);
-    ws.on('message', function incomming(data) {
-        fs.writeFile("temp.json", socket.clients.contents, 'utf8', function(err) {
-            if (err) {
-                console.log(err);
-            } else {
-                console.log("The file was saved!");
-            }
-        });
-        console.log(data);
-        var game = JSON.parse(data);
-        if (!game.started) {
-            console.log('%s started playing', game.player.name);
-            players.push(game.player);
+socketIO.on('connection', function(socket) {
 
-            if (players.length < 2) {
-                ws.send(JSON.stringify({
-                    message: 'Waiting for some other player to join...'
-                }));
-            } else if (players.length == 2) {
-                var gid = guidGenerator();
-                games[gid] = {};
-                games[gid]['players'] = players.slice();
-                games.game = game;
-                players = [];
-                games[gid].whoStarts = (Math.random() > 0.5) ? games[gid].players[1] : games[gid].players[1]
-                ws.send(JSON.stringify(games[gid]));
-            }
-        } else if (game.started && !game.finished) {
-            games[game.gid].game = game;
-            ws.send(JSON.stringify(game));
+    // Handle begin event from clients
+    socket.on('begin', function(data) {
+        console.log(socket.id);
+        var game = JSON.parse(data);
+        console.log('%s started playing', game.player.name);
+        players.push(game.player);
+        if (players.length < 2) {
+            socket.emit('wait', JSON.stringify({
+                message: 'Waiting for some other player to join...'
+            }));
+        } else if (players.length == 2) {
+            console.log('players are two. start game')
+            var gid = guidGenerator();
+            game.gid = gid;
+            games[gid] = {
+                'players': [],
+                'game': {}
+            };
+            games[gid]['players'] = players.slice();
+            games[gid]['game'] = game;
+            players = [];
+            var beginner = (Math.random() > 0.5) ? games[gid].players[1].id : games[gid].players[0].id;
+            console.log('beginner - %s', beginner);
+            socket.to(beginner).emit('begin', JSON.stringify(games[gid]));
+            console.log('Begin emitted for beginner');
         }
+    });
+
+    socket.on('move', function(data) {
+        console.log('Move played');
+        var game = JSON.parse(data);
+        gid = game.gid;
+        games[gid]['game'] = game;
+        var nextPlayer = (games[gid]['players'][0].id == game.player.id) ? games[gid].players[1] : games[gid].players[0];
+        console.log('lastPlayer' + game.player.id)
+        console.log('nextPlayer' + nextPlayer.id);
+        games[gid]['game']['player'] = nextPlayer;
+        socket.to(nextPlayer.id).emit('move', JSON.stringify(games[gid]));
     });
 });
 
+
 // Start server on port 3001
-server.listen(3002, () => {
+http.listen(3002, () => {
     console.log('socket server started at port: 3002');
 });
 
